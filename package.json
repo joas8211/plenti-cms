@@ -1,0 +1,10 @@
+{
+  "name": "plenti-cms",
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -cw"
+  },
+  "dependencies": {
+    "rollup": "^2.60.0"
+  }
+}
