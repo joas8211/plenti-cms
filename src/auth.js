@@ -59,7 +59,7 @@ async function start() {
 async function capture() {
     const { gitlab } = await getSettings();
     const { server, appId } = gitlab;
-    const codeVerifier = session.get(gitlab_code_verifier);
+    const codeVerifier = session.get('gitlab_code_verifier');
     const response = await fetch(
         `https://${server}/oauth/token` +
         `?client_id=${encodeURIComponent(appId)}` +
