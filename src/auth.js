@@ -1,5 +1,6 @@
 import { session } from './session.js';
 import { getSettings } from './settings.js';
+import { storage } from './storage.js';
 
 const parameters = Object.fromEntries(
     location.search.slice(1).split('&').map(
@@ -11,30 +12,23 @@ function randomInteger(min, max) {
     return Math.round(Math.random() * (max - min)) + min
 }
 
-/**
- * Generates string between 43 and 128 characters in length, which use the
- * characters A-Z, a-z, 0-9, -, ., _, and ~.
- */
 function generateString() {
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const characters = (letters + letters.toLowerCase() + '-._~').split('');
-    const length = randomInteger(43, 128);
-    let string = '';
-    for (let i = 0; i < length; i++) {
-        string += characters[randomInteger(0, characters.length)];
-    }
-    return string;
+    const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-.';
+    const randomValues = Array.from(crypto.getRandomValues(new Uint8Array(128)));
+    return randomValues
+        .map(val => chars[val % chars.length])
+        .join('');
 }
 
 async function hash(text) {
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
-    const array = new Uint8Array(await crypto.subtle.digest('SHA-256', data));
-    let binary = '';
-    for (let i = 0; i < array.length; i++) {
-        binary += array[i];
-    }
-    return btoa(binary);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    const binary = String.fromCharCode(...new Uint8Array(digest));
+    return btoa(binary)
+        .split('=')[0]
+        .replace(/\+/g, '-')
+        .replace(/\//g, '_');
 }
 
 async function start() {
@@ -49,7 +43,7 @@ async function start() {
     const { server, appId } = gitlab;
     location.href = `https://${server}/oauth/authorize` +
         `?client_id=${encodeURIComponent(appId)}` +
-        `&redirect_uri=${encodeURIComponent(location.origin + '?cms')}` +
+        `&redirect_uri=${encodeURIComponent(location.origin)}` +
         `&response_type=code` +
         `&state=${encodeURIComponent(state)}` +
         `&code_challenge=${encodeURIComponent(codeChallenge)}` +
@@ -65,11 +59,16 @@ async function capture() {
         `?client_id=${encodeURIComponent(appId)}` +
         `&code=${encodeURIComponent(parameters.code)}` +
         '&grant_type=authorization_code' +
-        `&redirect_uri=${encodeURIComponent(location.origin + '?cms')}` +
-        `&code_verifier=${encodeURIComponent(codeVerifier)}`
+        `&redirect_uri=${encodeURIComponent(location.origin)}` +
+        `&code_verifier=${encodeURIComponent(codeVerifier)}`,
+        { method: 'POST' }
     );
     const tokens = await response.json();
-    session.set('gitlab_tokens', tokens);
+    if (tokens.error) {
+        throw new Error(tokens.error_description);
+    }
+    storage.set('gitlab_tokens', tokens);
+    history.replaceState(null, '', location.pathname);
 }
 
 async function refresh() {
@@ -87,15 +86,19 @@ async function refresh() {
         `&refresh_token=${encodeURIComponent(refreshToken)}` +
         '&grant_type=refresh_token' +
         `&redirect_uri=${encodeURIComponent(location.origin + '?cms')}` +
-        `&code_verifier=${encodeURIComponent(codeVerifier)}`
+        `&code_verifier=${encodeURIComponent(codeVerifier)}`,
+        { method: 'POST' }
     );
     const tokens = await response.json();
-    session.set('gitlab_tokens', tokens);
+    if (tokens.error) {
+        throw new Error(tokens.error_description);
+    }
+    storage.set('gitlab_tokens', tokens);
 }
 
 export async function authenticate() {
     const state = session.get('gitlab_state');
-    const tokens = session.get('gitlab_tokens');
+    const tokens = storage.get('gitlab_tokens');
     if (
         parameters.code &&
         parameters.state &&
