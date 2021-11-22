@@ -76,7 +76,7 @@ async function refresh() {
         created_at: createdAt, 
         expires_in: expiresIn,
         refresh_token: refreshToken,
-    } = session.get('gitlab_tokens');
+    } = storage.get('gitlab_tokens');
     const expiresAt = (createdAt + expiresIn) * 1000;
     if (Date.now() < expiresAt) return;
 
