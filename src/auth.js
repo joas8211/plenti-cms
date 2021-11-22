@@ -1,6 +1,6 @@
-import { session } from './session.js';
-import { getSettings } from './settings.js';
-import { storage } from './storage.js';
+import { session } from './data/session.js';
+import { getSettings } from './data/settings.js';
+import { storage } from './data/storage.js';
 
 const parameters = Object.fromEntries(
     location.search.slice(1).split('&').map(

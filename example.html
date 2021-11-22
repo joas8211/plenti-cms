@@ -7,6 +7,26 @@
     <title>Document</title>
 </head>
 <body>
+    <div data-cms-object="pages/home.json">
+        <h1 data-cms-field="title">Hello, World!</h1>
+        <pre data-cms-field="multiline-text:some-multiline-text">Test</pre>
+        <div data-cms-field="content">
+            <div data-cms-block="example-block">
+                Block content
+            </div>
+        </div>
+        <div data-cms-list="blog">
+            <div data-cms-object="blog/hello.json">
+                <a href="/blog/hello">
+                    <h2 data-cms-field="title">Hello from blog!</h2>
+                    <div data-cms-field="excerpt">
+                        <p>This is post in which I welcome you to read the blog.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+    <a href="#cms">Edit</a>
     <script type="module" src="dist/entry.js" defer></script>
 </body>
 </html>
