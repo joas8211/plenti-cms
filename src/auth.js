@@ -78,7 +78,7 @@ async function refresh() {
         refresh_token: refreshToken,
     } = storage.get('gitlab_tokens');
     const expiresAt = (createdAt + expiresIn) * 1000;
-    if (Date.now() < expiresAt) return;
+    if (Date.now() > expiresAt) return;
 
     const response = await fetch(
         `https://${server}/oauth/token` +
