@@ -1,4 +1,5 @@
 import { Field } from '../field.js';
+import { content } from '../state/content.js';
 import { kebabCaseToTitleCase } from '../utils.js';
 
 export class PlainText extends Field {
@@ -15,13 +16,19 @@ export class PlainText extends Field {
 
     #sizeTestElement;
     #inputElement;
+    #realValue;
+    #fieldId;
+    #objectId;
+    #objectStore;
 
     constructor(target) {
         super(target);
 
+        this.#realValue = target.textContent.trim();
         const ids = target.getAttribute('data-cms-field').split(':');
-        if (!this.options.placeholder && ids[1]) {
-            this.options.placeholder = kebabCaseToTitleCase(ids[1]);
+        this.#fieldId = ids[1] || ids[0];
+        if (!this.options.placeholder) {
+            this.options.placeholder = kebabCaseToTitleCase(this.#fieldId);
         }
 
         this.#sizeTestElement = document.createElement('span');
@@ -55,7 +62,7 @@ export class PlainText extends Field {
             flexDirection: 'unset',
             overflowWrap: 'unset',
         });
-        this.#inputElement.addEventListener('input', () => this.#resize());
+        this.#inputElement.addEventListener('input', () => this.#onInput());
         if (!this.options.multiline) {
             this.#inputElement.addEventListener('keydown', event => {
                 if (event.key == 'Enter') {
@@ -66,11 +73,29 @@ export class PlainText extends Field {
 
         window.addEventListener('resize', () => this.#resize());
 
-        this.#inputElement.value = target.textContent.trim();
+        const objectElement = target.closest('[data-cms-object]');
+        this.#objectId = objectElement.getAttribute('data-cms-object');
+        this.#objectStore = content.getObjectStore(this.#objectId);
+        this.#objectStore.subscribe(value => {
+            this.#inputElement.value = this.#fieldId in value ?
+                value[this.#fieldId] :
+                this.#realValue;
+            this.#resize();
+        });
+
+        const object = this.#objectStore.get();
+        this.#inputElement.value = this.#fieldId in object ?
+            object[this.#fieldId] :
+            this.#realValue;
         target.innerHTML = '';
         target.appendChild(this.#sizeTestElement);
         target.appendChild(this.#inputElement);
         this.#resize();
+    }
+
+    #onInput() {
+        this.#resize();
+        this.#updateValue();
     }
 
     #resize() {
@@ -80,5 +105,11 @@ export class PlainText extends Field {
         this.#sizeTestElement.style.display = 'none';
         this.#inputElement.style.height = '';
         this.#inputElement.style.height = this.#inputElement.scrollHeight + 'px';
+    }
+
+    #updateValue() {
+        const object = this.#objectStore.get();
+        object[this.#fieldId] = this.#inputElement.value;
+        this.#objectStore.set(object);
     }
 }
