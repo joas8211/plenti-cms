@@ -1,0 +1,42 @@
+.toolbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #222222;
+    color: #fff;
+    display: flex;
+    padding: 0.5em;
+}
+
+.logo {
+    margin: 0;
+    color: #22a6ed;
+}
+
+.logo:after {
+    content: '';
+    border-left: solid 1px #444;
+    margin: 0 0.5em;
+}
+
+.actions {
+    display: flex;
+}
+
+.actions > button {
+    background-color: #444;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0.5em 1em;
+}
+
+.actions > button:hover {
+    background-color: #555;
+}
+
+.actions > button:not(:first-child) {
+    margin-left: 0.25em;
+}
