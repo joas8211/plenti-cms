@@ -4,7 +4,7 @@ import './elements/toolbar/toolbar.js';
 import { kebabCaseToCamelCase } from './utils.js';
 
 (async () => {
-    authenticate();
+    await authenticate();
 
     const toolbar = document.createElement('plenti-cms-toolbar');
     document.body.appendChild(toolbar);
