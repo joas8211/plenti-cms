@@ -106,13 +106,17 @@ export async function authenticate() {
         parameters.state == state
     ) {
         await capture();
+        return true;
     } else if (tokens) {
         try {
             await refresh();
+            return true;
         } catch (error) {
             await start();
+            return false;
         }
     } else {
         await start();
+        return false;
     }
 }
