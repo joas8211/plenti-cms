@@ -41,6 +41,12 @@ try {
   }
 }
 
+await Deno.mkdir(`${projectDirectory}/.vscode`);
+await writeFile(
+  `${projectDirectory}/.vscode/settings.json`,
+  '{\n    "deno.enable": true,\n}\n',
+);
+
 await Deno.mkdir(`${projectDirectory}/config`);
 await Deno.mkdir(`${projectDirectory}/config/modules`);
 
