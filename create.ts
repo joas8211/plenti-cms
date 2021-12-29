@@ -85,6 +85,7 @@ await writeFile(
     " --unstable\\\n" +
     " --allow-read\\\n" +
     " --allow-write\\\n" +
+    " --allow-net\\\n" +
     ` ${repositoryRoot}/build.ts\\\n` +
     " $(dirname $0)\n",
 );
