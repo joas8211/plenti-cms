@@ -12,6 +12,7 @@ const bundle = await rollup({
   input: {
     "plenti-cms": `${projectDirectory}/config/modules.ts`,
   },
+  preserveEntrySignatures: false,
 });
 await bundle.write({
   format: "esm",

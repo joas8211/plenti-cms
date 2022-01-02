@@ -52,16 +52,16 @@ await Deno.mkdir(`${projectDirectory}/config/modules`);
 
 const repositoryRoot = dirname(import.meta.url);
 await writeFile(
-  `${projectDirectory}/config/modules/urlFragmentInitTrigger.ts`,
-  `import { configure } from "${repositoryRoot}/modules/urlFragmentInitTrigger/mod.ts";\n` +
+  `${projectDirectory}/config/modules/urlFragmentStarter.ts`,
+  `import { configure } from "${repositoryRoot}/modules/urlFragmentStarter/mod.ts";\n` +
     "\n" +
     "configure({\n" +
     '  trigger: "cms",\n' +
     "});\n",
 );
 await writeFile(
-  `${projectDirectory}/config/modules/gitlabBackend.ts`,
-  `import { configure } from "${repositoryRoot}/modules/gitlabBackend/mod.ts";\n` +
+  `${projectDirectory}/config/modules/gitLabBackend.ts`,
+  `import { configure } from "${repositoryRoot}/modules/gitLabBackend/mod.ts";\n` +
     "\n" +
     "configure({\n" +
     '  server: "gitlab.com",\n' +
@@ -71,10 +71,10 @@ await writeFile(
 await writeFile(
   `${projectDirectory}/config/modules.ts`,
   "// Init triggers\n" +
-    'import "./modules/urlFragmentInitTrigger.ts";\n' +
+    'import "./modules/urlFragmentStarter.ts";\n' +
     "\n" +
     "// Backends\n" +
-    '// import "./modules/gitlabBackend.ts";\n',
+    '// import "./modules/gitLabBackend.ts";\n',
 );
 
 await writeFile(

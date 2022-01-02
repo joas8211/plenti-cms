@@ -1,6 +1,6 @@
-import { init } from "../../mod.ts";
+import { start } from "../../mod.ts";
 
-interface ModuleConfiguration {
+interface TriggerConfiguration {
   /**
    * Trigger word that should be detected from URL after hash sign (#) and will
    * cause initialization of the CMS application.
@@ -8,7 +8,7 @@ interface ModuleConfiguration {
   trigger: string;
 }
 
-export function configure({ trigger }: ModuleConfiguration) {
+export function configure({ trigger }: TriggerConfiguration) {
   if (location.hash == `#${trigger}`) {
     // The fragment must be inserted after the page has loaded so we remove it
     // at startup
@@ -16,6 +16,6 @@ export function configure({ trigger }: ModuleConfiguration) {
   }
   addEventListener("hashchange", () => {
     if (location.hash != `#${trigger}`) return;
-    init();
+    start();
   });
 }
